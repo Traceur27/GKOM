@@ -1,9 +1,12 @@
-#include "Ghost.h"
 #include <windows.h>
 #include <GL/gl.h>
-#include "glut.h"
 #include <iostream>
+#include <cstdlib>
+#include "Ghost.h"
+#include "glut.h"
 
+
+bool Ghost::canBeEaten = false;
 
 Ghost::Ghost()
 {
@@ -72,7 +75,12 @@ void Ghost::update()
 
 	glPushMatrix();
 	glTranslatef(x, y, z);
-	glColor3f(0.5, 0.5, 0.5);
+	
+	if (canBeEaten)
+		glColor4f(0.5, 0.5, 0.5, 0.7);
+	else
+		glColor3f(0.5, 0.5, 0.5);
+	
 	glutSolidSphere(0.9, 20, 10);
 	glPopMatrix();
 }
@@ -144,6 +152,35 @@ float Ghost::getX()
 float Ghost::getY()
 {
 	return y;
+}
+
+
+void myTimer(int value)
+{
+	Ghost::setState(false);
+}
+
+
+void Ghost::setState(bool s)
+{
+	if (s)
+	{
+		glutTimerFunc(10000, myTimer, 0);
+	}
+	canBeEaten = s;
+}
+
+bool Ghost::getState()
+{
+	return canBeEaten;
+}
+
+void Ghost::kill()
+{
+	if (rand() % 2)
+		setRoute1();
+	else
+		setRoute2();
 }
 
 Point::Point(float x, float y)

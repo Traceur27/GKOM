@@ -23,6 +23,7 @@ private:
 	float y;
 	float z;
 	float speed;
+	static bool canBeEaten;
 	EnemyDirection direction;
 
 	std::list<Point *> * route;
@@ -38,4 +39,8 @@ public:
 	void setRoute2();
 	float getX();
 	float getY();
+	static void setState(bool s);
+	static bool getState();
+	void kill();
+	//void myTimer(int value);
 };

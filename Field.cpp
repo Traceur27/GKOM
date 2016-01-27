@@ -2,12 +2,13 @@
 
 
 
-Field::Field(float x, float y, bool s, bool c)
+Field::Field(float x, float y, bool s, bool c, bool f)
 {
 	positionX = x;
 	positionY = y;
 	solid = s;
 	containPoint = c;
+	fruit = f;
 }
 
 
@@ -47,4 +48,14 @@ bool Field::getPoint()
 void Field::setPoint(bool s)
 {
 	containPoint = s;
+}
+
+void Field::setFruit(bool f)
+{
+	fruit = f;
+}
+
+bool Field::getFruit()
+{
+	return fruit;
 }

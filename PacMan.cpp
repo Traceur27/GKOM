@@ -1,11 +1,11 @@
-#include "PacMan.h"
-#include <windows.h>
-#include <GL/gl.h>
-#include "glut.h"
-#include "Field.h"
 #include <utility>
 #include <iterator>
 #include <iostream>
+#include <windows.h>
+#include <GL/gl.h>
+#include "PacMan.h"
+#include "glut.h"
+#include "Field.h"
 
 
 PacMan::PacMan()
@@ -33,9 +33,7 @@ PacMan::~PacMan()
 void PacMan::update()
 {
 	if (!checkAlive())
-	{
 		die();
-	}
 	else
 	{
 		if (changeDirection != NONE)
@@ -123,19 +121,22 @@ bool PacMan::checkCollision()
 
 	std::list <Field *> * foundFields = board->findField(x, y);
 
-	//std::cout << "Pozycja pacmana: x " << x << ", y " << y << std::endl;
-
 	for (std::list<Field *>::iterator it = foundFields->begin(); it != foundFields->end(); ++it)
 	{
-		 //std::cout << "Pole o wspolrzednych: x  " << (*it)->getX() << ", y  " << (*it)->getY() << std::endl;
 		if ((*it)->getPoint())
 		{
-			increaseScore();
+			increaseScore(10);
 			(*it)->setPoint(false);
-			//std::cout << "Score: " << score << std::endl;
+		}
+		if ((*it)->getFruit())
+		{
+			increaseScore(100);
+			(*it)->setFruit(false);
+			Ghost::setState(true);
 		}
 
-		 if ((*it)->isSolid())
+
+		if ((*it)->isSolid())
 			 return true;
 	}
 
@@ -147,7 +148,15 @@ bool PacMan::checkAlive()
 	for (std::list<Ghost *>::iterator it = ghosts->begin(); it != ghosts->end(); ++it)
 	{
 		if (x >= (*it)->getX() - 1 && x <= (*it)->getX() + 1 && y >= (*it)->getY() - 1 && y <= (*it)->getY() + 1)
+		{
+			if (Ghost::getState())
+			{
+				(*it)->kill();
+				increaseScore(100);
+				return true;
+			}
 			return false;
+		}
 	}
 	return true;
 }
@@ -163,9 +172,9 @@ void PacMan::setDirection(Direction d)
 	changeDirection = d;
 }
 
-void PacMan::increaseScore()
+void PacMan::increaseScore(int amount)
 {
-	score += 10;
+	score += amount;
 }
 
 void PacMan::setGhost(Ghost * g)
@@ -189,7 +198,46 @@ void PacMan::die()
 
 void PacMan::drawGUI()
 {
+	char lifesLeft = lifes + '0';
+	char scoreChar[20];
+	sprintf(scoreChar, "%d", score);
+
+	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	
 	glColor3f(1, 1, 1);
+	
+	glDisable(GL_DEPTH_TEST);
+	glRasterPos2f(-0.95, -1);
+
+	
+	for (int i = 0; i < strlen(lifesText); ++i)
+	{
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, lifesText[i]);
+	}
+
+	glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, lifesLeft);
+
+	glRasterPos2f(0.60, -1);
+
+	for (int i = 0; i < strlen(scoreText); ++i)
+	{
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, scoreText[i]);
+	}
+
+	for (int i = 0; i < strlen(scoreChar); ++i)
+	{
+		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, scoreChar[i]);
+	}
+
+	glEnable(GL_DEPTH_TEST);
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 }

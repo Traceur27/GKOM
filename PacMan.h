@@ -1,7 +1,8 @@
 #pragma once
+
+#include <list>
 #include "Board.h"
 #include "Ghost.h"
-#include <list>
 
 enum Direction {NONE, NORTH, SOUTH, EAST, WEST};
 
@@ -16,6 +17,8 @@ private:
 	std::list<Ghost *> * ghosts;
 	int score;
 	int lifes;
+	char * lifesText = "Lifes left: ";
+	char * scoreText = "Score: ";
 
 public:
 	PacMan();
@@ -27,7 +30,7 @@ public:
 	bool checkCollision();
 	bool checkAlive();
 	void tryChange(Direction d);
-	void increaseScore();
+	void increaseScore(int amount);
 	void die();
 	void drawGUI();
 };

@@ -1,22 +1,20 @@
 #include <windows.h>
 #include <GL/gl.h>
+#include <iostream>
 #include "glut.h"
 #include "PacMan.h"
 #include "Board.h"
-#include <iostream>
 #include "Ghost.h"
+#include "SOIL.h"
 
+#define TICKS_PER_SECOND 30
 
-GLfloat rotatex = 0.0;
+const int TIMER_MILLISECONDS = 1000 / TICKS_PER_SECOND;
+
+GLfloat rotatex = -20.0;
 GLfloat rotatey = 0.0;
 
-//const GLdouble left = -10.0;
-//const GLdouble right = 10.0;
-//const GLdouble bottom = -10.0;
-//const GLdouble top = 10.0;
-//const GLdouble near1 = 1.0;
-//const GLdouble far1 = 5.0;
-
+//Parametry bryly odcinania
 GLdouble left = -21.0;
 GLdouble right = 21.0;
 GLdouble bottom = -21.0;
@@ -24,48 +22,71 @@ GLdouble top = 21.0;
 GLdouble near1 = 1.0;
 GLdouble far1 = 41.0;
 
-GLfloat lm_ambient[] = { 0.2, 0.2, 0.2, 1.0 };//0.2 0.2 0.2
+//Parametry oswietlenia
+GLfloat lm_ambient[] = { 0.6, 0.6, 0.6, 1.0 };
 
-GLfloat scale = 1.0;
 PacMan * pacman = new PacMan();
 Board * board = new Board();
 Ghost * ghost1 = new Ghost();
 Ghost * ghost2 = new Ghost();
 
+GLfloat scale = 1.0;
+int previousTime;
+int currentTime;
+int elapsedTime;
+
+
+//Funkcja wywolujaca Display ze stalym framerate
+void processAnimationTimer(int value) 
+{
+	// Przygotowanie timera
+	glutTimerFunc(TIMER_MILLISECONDS, processAnimationTimer, 0);
+
+	previousTime = currentTime;
+
+	currentTime = glutGet(GLUT_ELAPSED_TIME);
+	elapsedTime = currentTime - previousTime;
+
+	//Przerysuj scene 
+	glutPostRedisplay();
+}
+
 
 void Display()
 {
+	previousTime = currentTime;
+
+	currentTime = glutGet(GLUT_ELAPSED_TIME);
+	elapsedTime = currentTime - previousTime;
+
+	//Zamalowanie sceny
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 
-	//Clear the color buffer and z buffer
+	//Wyczyszczenie bufora koloru i glebokosci
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// wybór macierzy modelowania
-	glMatrixMode(GL_MODELVIEW); //- potrzebne przy rysowaniu primitywuw
+	//Wybor macierzy modelowania
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	// przesuniêcie uk³adu wspó³rzêdnych obiektu do œrodka bry³y odcinania
-	//glTranslatef(0, 0, -(far1 + near1) / 2);
 
-	//std::cout << "x: " << rotatex << "y: " << rotatey << "scale: " << scale << std::endl;
-
+	//Przesuniêcie uk³adu wspó³rzêdnych obiektu do œrodka bry³y odcinania
 	glTranslatef(0, 0, -21);
 
-	// obroty obiektu - klawisze kursora
+	//Obroty obiektu - klawisze kursora
 	glRotatef(rotatex, 1.0, 0, 0);
 	glRotatef(rotatey, 0, 1.0, 0);
-
-	//glRotatef(-6, 1.0, 0, 0);
 	
-	// skalowanie obiektu - klawisze "+" i "-"
+	//Skalowanie obiektu - klawisze "+" i "-"
 	glScalef(scale, scale, scale);
-	//glScalef(0.5, 0.5, 0.5);
 
+	//Zmiana jasnosci oswietlenia sceny - klawisze "i" oraz "k"
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lm_ambient);
 
 	board->update();
 	ghost1->update();
 	ghost2->update();
 	pacman->update();
+	pacman->drawGUI();
 
 	glFlush();
 	glutSwapBuffers();
@@ -78,27 +99,22 @@ void Reshape(int width, int height)
 
 	// wybór macierzy rzutowania
 	glMatrixMode(GL_PROJECTION);
-
-	// macierz rzutowania = macierz jednostkowa
 	glLoadIdentity();
 
 
 	if (width < height && width > 0)
-		glFrustum(left, right, bottom * height / width, top * height / width, near1, far1);
+		glOrtho(left, right, bottom * height / width, top * height / width, near1, far1);
 	else
-
 		// szerokoœæ okna wiêksza lub równa wysokoœci okna
 		if (width >= height && height > 0)
 			glOrtho(left * width / height, right * width / height, bottom, top, near1, far1);
 
-	//glMatrixMode(GL_MODELVIEW);
 	Display();
 }
 
 
 void Keyboard(unsigned char key, int x, int y)
 {
-	// klawisz +
 	if (key == '+')
 		scale += 0.1;
 	else if (key == '-' && scale > 0.1)
@@ -111,6 +127,18 @@ void Keyboard(unsigned char key, int x, int y)
 		pacman->setDirection(NORTH);
 	else if(key == 's')
 		pacman->setDirection(SOUTH);
+	else if (key == 'm')
+	{
+		if (glIsEnabled(GL_FOG))
+		{
+			glDisable(GL_FOG);
+		}
+		else
+		{
+			glEnable(GL_FOG);
+			glFogf(GL_FOG_DENSITY, 0.05);
+		}
+	}
 	else if (key == 'i')
 	{
 		lm_ambient[0] += 0.1;
@@ -135,10 +163,8 @@ void Keyboard(unsigned char key, int x, int y)
 			lm_ambient[2] = 0;
 		}
 	}
-
-	// odrysowanie okna
-	//Reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 }
+
 
 void KeyboardUp(unsigned char key, int x, int y)
 {
@@ -146,38 +172,33 @@ void KeyboardUp(unsigned char key, int x, int y)
 		pacman->setDirection(NONE);
 }
 
+
 void SpecialKeys(int key, int x, int y)
 {
 	switch (key)
 	{
-		// kursor w lewo
 	case GLUT_KEY_LEFT:
 		rotatey -= 1;
 		break;
 
-		// kursor w górê
 	case GLUT_KEY_UP:
 		rotatex -= 1;
 		break;
 
-		// kursor w prawo
 	case GLUT_KEY_RIGHT:
 		rotatey += 1;
 		break;
 
-		// kursor w dó³
 	case GLUT_KEY_DOWN:
 		rotatex += 1;
 		break;
 	}
-
-	// odrysowanie okna
-	//Reshape(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 }
+
 
 void init()
 {
-	GLfloat light_position[] = { 0.0, 0.0, 20.0, 1.0 }; 
+	GLfloat light_position[] = { 0.0, 0.0, 10.0, 1.0 }; 
 
 	board->init();
 	pacman->setBoard(board);
@@ -185,14 +206,18 @@ void init()
 	ghost2->setRoute2();
 	pacman->setGhost(ghost1);
 	pacman->setGhost(ghost2);
+	
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lm_ambient);
+
 	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
+
 
 int main(int argc, char** argv)
 {
@@ -200,7 +225,7 @@ int main(int argc, char** argv)
 
    glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH );
 
-   //Draw the window in the middle of the screen
+   //Rysowanie okna na srodku ekranu
    glutInitWindowPosition( (glutGet(GLUT_SCREEN_WIDTH) - 600)/2, (glutGet(GLUT_SCREEN_HEIGHT) - 600 )/2 );
    glutInitWindowSize( 600, 600 );
 
@@ -208,34 +233,20 @@ int main(int argc, char** argv)
 
    glutDisplayFunc(Display);
    glutReshapeFunc(Reshape);
-   glutIdleFunc(Display);
 
-   // do³¹czenie funkcji obs³ugi klawiatury
+   //Doloczenie obslugi klawiatury
    glutKeyboardFunc(Keyboard);
    glutKeyboardUpFunc(KeyboardUp);
-   // do³¹czenie funkcji obs³ugi klawiszy funkcyjnych i klawiszy kursora
    glutSpecialFunc(SpecialKeys);
 
    init();
 
-
+   //Ustawienie timera
+   glutTimerFunc(TIMER_MILLISECONDS, processAnimationTimer, 0);
+   //Czas jaki uplynal od wywolania glutInit
+   currentTime = glutGet(GLUT_ELAPSED_TIME);
 
    glutMainLoop();
 
    return 0;
 }
-
-
-/*
-Oswietlenie:
-- glEnable GL_LIGHTING, GL_LIGHT0 i bufor g³êbokoœci
-- glLightfv( GL_LIGHT0, GL_POSITION, light_position ); lightPosition 4 wartosci
-- zmiana parametrow swiatla przy uzycie GL_AMBIENT, GL_DIFFUSE, GL_SPECULAR
-- ustawienie modelu oswietlenia glLightModelfv( GL_LIGHT_MODEL_AMBIENT, lm_ambient ); mozliwe ze tez GL_LIGHT_MODEL_COLOR_CONTROL - do tekstur
-- ustawienie materialow glMaterialfv( GL_FRONT, GL_AMBIENT, mat_ambient );
-- trzeba zdefiniowacwektory normalne void glNormal3fv( const GLfloat * v )
-
-
-
-
-*/

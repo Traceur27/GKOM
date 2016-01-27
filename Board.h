@@ -1,8 +1,9 @@
 #pragma once
 
 #include <list>
-#include "Field.h"
 #include <utility>
+#include "Field.h"
+
 
 class Board
 {
@@ -12,6 +13,8 @@ private:
 	static const int fieldsMap[fieldsInRow][fieldsInColumn];
 	std::list<Field *> * fields;
 	std::list<Field *> * foundFields;
+	int texture;
+	int background;
 
 
 public:
@@ -20,5 +23,8 @@ public:
 	void init();
 	void update();
 	std::list<Field *> * findField(float x, float y);
+	int loadGLTextures();
+	void drawCube();
+	void drawBackground();
 };
 
