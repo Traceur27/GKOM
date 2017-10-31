@@ -1,9 +1,9 @@
 #include <GL/gl.h>
-#include <iterator>
-#include <iostream>
-#include "Board.h"
-#include "Field.h"
 #include <GL/glut.h>
+#include <iostream>
+#include <iterator>
+
+#include "Board.h"
 #include "SOIL.h"
 
 

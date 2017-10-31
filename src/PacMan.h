@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+
 #include "Board.h"
 #include "Ghost.h"
 

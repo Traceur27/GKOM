@@ -1,12 +1,11 @@
-#include <utility>
+#include <GL/gl.h>
+#include <GL/glut.h>
 #include <iterator>
 #include <iostream>
-#include <GL/gl.h>
+#include <cstring>
+#include <utility>
+
 #include "PacMan.h"
-#include <GL/glut.h>
-#include "Field.h"
-#include <string.h>
-#include <cstdio>
 
 PacMan::PacMan()
 {

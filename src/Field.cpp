@@ -1,7 +1,6 @@
 #include "Field.h"
 
 
-
 Field::Field(float x, float y, bool s, bool c, bool f)
 {
 	positionX = x;

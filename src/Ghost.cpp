@@ -1,8 +1,8 @@
 #include <GL/gl.h>
+#include <GL/glut.h>
 #include <iostream>
-#include <cstdlib>
+
 #include "Ghost.h"
-#include "GL/glut.h"
 
 
 bool Ghost::canBeEaten = false;

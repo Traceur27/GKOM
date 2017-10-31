@@ -1,10 +1,7 @@
 #include <GL/gl.h>
-#include <iostream>
 #include <GL/glut.h>
+
 #include "PacMan.h"
-#include "Board.h"
-#include "Ghost.h"
-#include <SOIL.h>
 
 #define TICKS_PER_SECOND 30
 
@@ -13,7 +10,6 @@ const int TIMER_MILLISECONDS = 1000 / TICKS_PER_SECOND;
 GLfloat rotatex = -20.0;
 GLfloat rotatey = 0.0;
 
-//Parametry bryly odcinania
 GLdouble left = -21.0;
 GLdouble right = 21.0;
 GLdouble bottom = -21.0;
@@ -21,7 +17,7 @@ GLdouble top = 21.0;
 GLdouble near1 = 1.0;
 GLdouble far1 = 41.0;
 
-//Parametry oswietlenia
+// Lighting parameters
 GLfloat lm_ambient[] = { 0.6, 0.6, 0.6, 1.0 };
 
 PacMan * pacman = new PacMan();
@@ -35,18 +31,17 @@ int currentTime;
 int elapsedTime;
 
 
-//Funkcja wywolujaca Display ze stalym framerate
+//Calling display with constant frame rate
 void processAnimationTimer(int value) 
 {
-	// Przygotowanie timera
+	//Setup timer
 	glutTimerFunc(TIMER_MILLISECONDS, processAnimationTimer, 0);
-
 	previousTime = currentTime;
 
 	currentTime = glutGet(GLUT_ELAPSED_TIME);
 	elapsedTime = currentTime - previousTime;
 
-	//Przerysuj scene
+	//Redraw scene
 	glutPostRedisplay();
 }
 
@@ -58,27 +53,27 @@ void Display()
 	currentTime = glutGet(GLUT_ELAPSED_TIME);
 	elapsedTime = currentTime - previousTime;
 
-	//Zamalowanie sceny
+	//Fill in the whole scene
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 
-	//Wyczyszczenie bufora koloru i glebokosci
+	//Clear depth and color buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//Wybor macierzy modelowania
+	//Pick modelview matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	//Przesuni�cie uk�adu wsp�rz�dnych obiektu do �rodka bry�y odcinania
+	//Move coordinate system to the center
 	glTranslatef(0, 0, -21);
 
-	//Obroty obiektu - klawisze kursora
+	//Rotate the object - use arrow keys
 	glRotatef(rotatex, 1.0, 0, 0);
 	glRotatef(rotatey, 0, 1.0, 0);
 	
-	//Skalowanie obiektu - klawisze "+" i "-"
+	//Scaling the object - "+" and "-"
 	glScalef(scale, scale, scale);
 
-	//Zmiana jasnosci oswietlenia sceny - klawisze "i" oraz "k"
+	//Changing ambient lightning of the scene - "i" and "k"
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lm_ambient);
 
 	board->update();
@@ -93,10 +88,10 @@ void Display()
 
 void Reshape(int width, int height)
 {
-	// obszar renderingu - ca�e okno
+	// Rendering will be processed on the whole window
 	glViewport(0, 0, width, height);
 
-	// wyb�r macierzy rzutowania
+	// Pick projection matrix
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
@@ -104,7 +99,6 @@ void Reshape(int width, int height)
 	if (width < height && width > 0)
 		glOrtho(left, right, bottom * height / width, top * height / width, near1, far1);
 	else
-		// szeroko�� okna wi�ksza lub r�wna wysoko�ci okna
 		if (width >= height && height > 0)
 			glOrtho(left * width / height, right * width / height, bottom, top, near1, far1);
 
@@ -224,7 +218,6 @@ int main(int argc, char** argv)
 
    glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH );
 
-   //Rysowanie okna na srodku ekranu
    glutInitWindowPosition( (glutGet(GLUT_SCREEN_WIDTH) - 600)/2, (glutGet(GLUT_SCREEN_HEIGHT) - 600 )/2 );
    glutInitWindowSize( 600, 600 );
 
@@ -233,16 +226,15 @@ int main(int argc, char** argv)
    glutDisplayFunc(Display);
    glutReshapeFunc(Reshape);
 
-   //Doloczenie obslugi klawiatury
+   //Add keyboard handling
    glutKeyboardFunc(Keyboard);
    glutKeyboardUpFunc(KeyboardUp);
    glutSpecialFunc(SpecialKeys);
 
    init();
 
-   //Ustawienie timera
    glutTimerFunc(TIMER_MILLISECONDS, processAnimationTimer, 0);
-   //Czas jaki uplynal od wywolania glutInit
+   //Time elapsed since calling glutInit
    currentTime = glutGet(GLUT_ELAPSED_TIME);
 
    glutMainLoop();

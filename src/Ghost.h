@@ -41,6 +41,5 @@ public:
 	float getY();
 	static void setState(bool s);
 	static bool getState();
-	void kill();
-	//void myTimer(int value);
+	void kill();;
 };
