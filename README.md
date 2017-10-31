@@ -22,3 +22,6 @@ Controls:
 * use 'i' and 'k' keys to change the lightning
 * use '+' and '-' to zoom in/out the board
 * use 'w','a','s', 'd' to move Pacman
+
+## Screenshot
+![](screenshots/pacman.png?raw=true)
