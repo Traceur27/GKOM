@@ -46,7 +46,7 @@ void processAnimationTimer(int value)
 	currentTime = glutGet(GLUT_ELAPSED_TIME);
 	elapsedTime = currentTime - previousTime;
 
-	//Przerysuj scene 
+	//Przerysuj scene
 	glutPostRedisplay();
 }
 
@@ -68,7 +68,7 @@ void Display()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	//Przesuniêcie uk³adu wspó³rzêdnych obiektu do œrodka bry³y odcinania
+	//Przesuniï¿½cie ukï¿½adu wspï¿½rzï¿½dnych obiektu do ï¿½rodka bryï¿½y odcinania
 	glTranslatef(0, 0, -21);
 
 	//Obroty obiektu - klawisze kursora
@@ -93,10 +93,10 @@ void Display()
 
 void Reshape(int width, int height)
 {
-	// obszar renderingu - ca³e okno
+	// obszar renderingu - caï¿½e okno
 	glViewport(0, 0, width, height);
 
-	// wybór macierzy rzutowania
+	// wybï¿½r macierzy rzutowania
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
@@ -104,7 +104,7 @@ void Reshape(int width, int height)
 	if (width < height && width > 0)
 		glOrtho(left, right, bottom * height / width, top * height / width, near1, far1);
 	else
-		// szerokoœæ okna wiêksza lub równa wysokoœci okna
+		// szerokoï¿½ï¿½ okna wiï¿½ksza lub rï¿½wna wysokoï¿½ci okna
 		if (width >= height && height > 0)
 			glOrtho(left * width / height, right * width / height, bottom, top, near1, far1);
 

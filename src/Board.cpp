@@ -1,10 +1,9 @@
-#include <windows.h>
 #include <GL/gl.h>
 #include <iterator>
 #include <iostream>
 #include "Board.h"
 #include "Field.h"
-#include "glut.h"
+#include <GL/glut.h>
 #include "SOIL.h"
 
 
@@ -172,7 +171,7 @@ int Board::loadGLTextures()									// Load Bitmaps And Convert To Textures
 	glEnable(GL_TEXTURE_2D);
 	texture = SOIL_load_OGL_texture
 		(
-			"temple_wall.bmp",
+			"../res/temple_wall.bmp",
 			SOIL_LOAD_AUTO,
 			SOIL_CREATE_NEW_ID,
 			SOIL_FLAG_INVERT_Y
@@ -180,7 +179,7 @@ int Board::loadGLTextures()									// Load Bitmaps And Convert To Textures
 
 	background = SOIL_load_OGL_texture
 		(
-			"background.bmp",
+			"../res/background.bmp",
 			SOIL_LOAD_AUTO,
 			SOIL_CREATE_NEW_ID,
 			SOIL_FLAG_INVERT_Y
